@@ -88,7 +88,8 @@ export const language: i18n =
 			info_defaultFileIcon: "Icona da usare per i file. Usa il prefisso \"lucide//\" per usare un'icona Lucide",
 			info_defaultMediaIcon: "Icona da usare per i file multimediali. Usa il prefisso \"lucide//\" per usare un'icona Lucide",
 			info_exposeStartingPath: "Mostra il file corrente nell'albero all'apertura della pagina",
-			info_enableFolderNotesSupport: "Abilita il supporto per il plugin Folder notes."
+			info_enableFolderNotesSupport: "Abilita il supporto per il plugin Folder notes.",
+			info_enableManualSortingSupport: "Abilita il supporto per il plugin Manual Sorting."
 		},
 		outline: {
 			title: "Struttura",

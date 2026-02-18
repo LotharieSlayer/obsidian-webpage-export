@@ -95,7 +95,8 @@ export const language: i18n =
 			info_defaultFileIcon: "The icon to use for files. Prefix with 'lucide//' to use a Lucide icon",
 			info_defaultMediaIcon: "The icon to use for media files. Prefix with 'lucide//' to use a Lucide icon",
 			info_exposeStartingPath: "Whether or not to show the current file in the file tree when the page is first loaded",
-			info_enableFolderNotesSupport: "Enable support for Folder notes plugin."
+			info_enableFolderNotesSupport: "Enable support for Folder notes plugin.",
+			info_enableManualSortingSupport: "Enable support for Manual Sorting plugin."
 		},
 		outline: {
 			title: "Outline", 

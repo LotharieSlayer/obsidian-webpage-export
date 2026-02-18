@@ -20,6 +20,9 @@ export class FileTree extends Tree
 	/** When Folder notes true, (so files with the same name as their parent folder or a folder as sibling) are merged with the same-name folder */
 	public enableFolderNotesSupport: boolean = false;
 
+	/** When Manual Sorting true, the file-tree will look to data.json of this plugin and sort files according to the order specified. */
+	public enableManualSortSupport: { [folderPath: string]: string[] } | undefined = undefined;
+
 	public files: Path[];
 	public keepOriginalExtensions: boolean;
 	public sort: boolean;
@@ -142,7 +145,11 @@ export class FileTree extends Tree
 			this.mergeFolderNotes(this.children);
 		}
 
-		if (this.sort) 
+		if (this.enableManualSortSupport) 
+		{
+			this.sortByManualOrder(this.children, "/");
+		}
+		else if (this.sort) 
 		{
 			this.sortAlphabetically(); // Sorts children of 'this' and recursively
 			this.sortByIsFolder();   // Sorts children of 'this' and recursively
@@ -213,10 +220,46 @@ export class FileTree extends Tree
 		}
 	}
 
+	/**
+	 * Recursively sort children using the manual-sorting plugin order.
+	 * Falls back to alphabetical + folders-first if a folder has no manual order entry.
+	 */
+	private sortByManualOrder(children: FileTreeItem[], folderPath: string): void {
+		const order = this.enableManualSortSupport?.[folderPath];
+		if (order && order.length > 0) {
+			// Build a lookup from vault path to its index in the manual order
+			const orderIndex = new Map<string, number>();
+			for (let i = 0; i < order.length; i++) {
+				orderIndex.set(order[i], i);
+			}
+			children.sort((a, b) => {
+				const aIdx = a.dataRef !== undefined ? orderIndex.get(a.dataRef) : undefined;
+				const bIdx = b.dataRef !== undefined ? orderIndex.get(b.dataRef) : undefined;
+				// Items found in manual order come first, ordered by their index.
+				// Items not in the list go to the end, sorted alphabetically.
+				if (aIdx !== undefined && bIdx !== undefined) return aIdx - bIdx;
+				if (aIdx !== undefined) return -1;
+				if (bIdx !== undefined) return 1;
+				return a.title.localeCompare(b.title, undefined, { numeric: true });
+			});
+		} else {
+			// No manual order for this folder - fall back to alphabetical and folders first
+			children.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
+			children.sort((a, b) => (a.isFolder === b.isFolder) ? 0 : a.isFolder ? -1 : 1);
+		}
+
+		// Recurse into child folders
+		for (const child of children) {
+			if (child.isFolder && child.children.length > 0 && child.dataRef) {
+				this.sortByManualOrder(child.children, child.dataRef);
+			}
+		}
+	}
+
     private assignTreeOrder(): void {
         let orderCounter = { value: 0 }; // Use an object to pass by reference
         // Sort children at the root level first if not already done by recursive sort methods
-        if (this.sort) {
+        if (this.sort && !this.enableManualSortSupport) {
             this.children.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
             this.children.sort((a, b) => (a.isFolder === b.isFolder) ? 0 : a.isFolder ? -1 : 1);
         }
@@ -228,7 +271,7 @@ export class FileTree extends Tree
     private assignTreeOrderRecursive(item: FileTreeItem, orderCounter: { value: number }): void {
         item.treeOrder = orderCounter.value++;
         // Ensure item's children are sorted before recursing
-        if (this.sort) {
+        if (this.sort && !this.enableManualSortSupport) {
             item.children.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
             item.children.sort((a, b) => (a.isFolder === b.isFolder) ? 0 : a.isFolder ? -1 : 1);
         }

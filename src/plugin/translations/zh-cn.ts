@@ -94,7 +94,8 @@ export const language: i18n =
 			info_defaultFileIcon: "用于文件的图标。使用'lucide//'前缀使用Lucide图标",
 			info_defaultMediaIcon: "用于媒体文件的图标。使用'lucide//'前缀使用Lucide图标",
 			info_exposeStartingPath: "在页面首次加载时是否显示文件树中的当前文件",
-			info_enableFolderNotesSupport: "启用对Folder notes插件的支持。"
+			info_enableFolderNotesSupport: "启用对Folder notes插件的支持。",
+			info_enableManualSortingSupport: "启用对Manual Sorting插件的支持。"
 		},
 		outline: {
 			title: "大纲",
