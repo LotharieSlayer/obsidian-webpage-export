@@ -27,7 +27,9 @@ function copyUsingSelection(text: string, ownerDocument: Document): boolean {
 
 	let copied = false;
 	try {
-		copied = ownerDocument.execCommand("copy");
+		copied = ownerDocument.execCommand?.("copy") ?? false;
+	} catch (error) {
+		console.warn("Selection fallback write failed", error);
 	} finally {
 		textArea.remove();
 		selection?.removeAllRanges();
