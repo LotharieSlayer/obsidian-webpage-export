@@ -1,16 +1,30 @@
-import { MarkdownRendererOptions } from "./api-options";
-import { Component, Notice, WorkspaceLeaf, MarkdownRenderer as ObsidianRenderer, MarkdownPreviewView, loadMermaid, TFile, MarkdownView, View, MarkdownPreviewRenderer, TAbstractFile, TFolder, Setting } from "obsidian";
-import { TabManager } from "src/plugin/utils/tab-manager";
+import {MarkdownRendererOptions} from "./api-options";
+import {
+	Component,
+	Notice,
+	WorkspaceLeaf,
+	MarkdownRenderer as ObsidianRenderer,
+	MarkdownPreviewView,
+	loadMermaid,
+	TFile,
+	MarkdownView,
+	View,
+	MarkdownPreviewRenderer,
+	TAbstractFile,
+	TFolder,
+	Setting
+} from "obsidian";
+import {TabManager} from "src/plugin/utils/tab-manager";
 import * as electron from 'electron';
-import { Settings, SettingsPage } from "src/plugin/settings/settings";
-import { Path } from "src/plugin/utils/path";
-import { SimpleFileListGenerator } from "src/plugin/features/simple-list-generator";
-import { DataviewRenderer } from "./dataview-renderer";
-import { Utils } from "../utils/utils";
-import { AssetLoader } from "../asset-loaders/base-asset";
-import { AssetType } from "../asset-loaders/asset-types";
-import { IconHandler } from "../utils/icon-handler";
-import { AssetHandler } from "../asset-loaders/asset-handler";
+import {Settings, SettingsPage} from "src/plugin/settings/settings";
+import {Path} from "src/plugin/utils/path";
+import {SimpleFileListGenerator} from "src/plugin/features/simple-list-generator";
+import {DataviewRenderer} from "./dataview-renderer";
+import {Utils} from "../utils/utils";
+import {AssetLoader} from "../asset-loaders/base-asset";
+import {AssetType} from "../asset-loaders/asset-types";
+import {IconHandler} from "../utils/icon-handler";
+import {AssetHandler} from "../asset-loaders/asset-handler";
 
 export namespace MarkdownRendererAPI {
 	export const viewableMediaExtensions = ["png", "jpg", "jpeg", "svg", "gif", "bmp", "ico", "mp4", "mov", "avi", "webm", "mpeg", "mp3", "wav", "ogg", "aac", "pdf", "html", "htm", "json", "txt", "yaml"];
@@ -42,7 +56,10 @@ export namespace MarkdownRendererAPI {
 		return html;
 	}
 
-	export async function renderFile(file: TFile, options?: MarkdownRendererOptions): Promise<{ contentEl: HTMLElement; viewType: string; } | undefined> {
+	export async function renderFile(file: TFile, options?: MarkdownRendererOptions): Promise<{
+		contentEl: HTMLElement;
+		viewType: string;
+	} | undefined> {
 		options = Object.assign(new MarkdownRendererOptions(), options);
 		const result = await _MarkdownRendererInternal.renderFile(file, options);
 		if (!result) return;
@@ -161,9 +178,12 @@ export namespace _MarkdownRendererInternal {
 		return;
 	}
 
-	export async function renderFile(file: TFile, options: MarkdownRendererOptions): Promise<{ contentEl: HTMLElement, viewType: string } | undefined> {
+	export async function renderFile(file: TFile, options: MarkdownRendererOptions): Promise<{
+		contentEl: HTMLElement,
+		viewType: string
+	} | undefined> {
 		if (MarkdownRendererAPI.viewableMediaExtensions.contains(file.extension)) {
-			return { contentEl: await createMediaPage(file, options), viewType: "attachment" };
+			return {contentEl: await createMediaPage(file, options), viewType: "attachment"};
 		}
 
 		const loneFile = !batchStarted;
@@ -178,9 +198,8 @@ export namespace _MarkdownRendererInternal {
 		let html: HTMLElement | undefined;
 
 		try {
-			await renderLeaf.openFile(file, { active: false });
-		}
-		catch (e) {
+			await renderLeaf.openFile(file, {active: false});
+		} catch (e) {
 			return failRender(file, e);
 		}
 
@@ -212,7 +231,7 @@ export namespace _MarkdownRendererInternal {
 
 		if (loneFile) _MarkdownRendererInternal.endBatch();
 
-		return { contentEl: html, viewType: viewType };
+		return {contentEl: html, viewType: viewType};
 	}
 
 	export async function renderMarkdown(markdown: string, options: MarkdownRendererOptions): Promise<HTMLElement | undefined> {
@@ -231,8 +250,7 @@ export namespace _MarkdownRendererInternal {
 
 		try {
 			view.setViewData(markdown, false);
-		}
-		catch (e) {
+		} catch (e) {
 			return failRender(undefined, e);
 		}
 
@@ -260,8 +278,7 @@ export namespace _MarkdownRendererInternal {
 			await renderer.unfoldAllHeadings();
 			await renderer.unfoldAllLists();
 			await renderer.parseSync();
-		}
-		catch (e) {
+		} catch (e) {
 			ExportLog.error(e, "Failed to unfold or parse renderer!");
 		}
 
@@ -270,11 +287,26 @@ export namespace _MarkdownRendererInternal {
 			await loadMermaid();
 		}
 
-		const sections = renderer.sections as { "rendered": boolean, "height": number, "computed": boolean, "lines": number, "lineStart": number, "lineEnd": number, "used": boolean, "highlightRanges": number, "level": number, "headingCollapsed": boolean, "shown": boolean, "usesFrontMatter": boolean, "html": string, "el": HTMLElement }[];
+		const sections = renderer.sections as {
+			"rendered": boolean,
+			"height": number,
+			"computed": boolean,
+			"lines": number,
+			"lineStart": number,
+			"lineEnd": number,
+			"used": boolean,
+			"highlightRanges": number,
+			"level": number,
+			"headingCollapsed": boolean,
+			"shown": boolean,
+			"usesFrontMatter": boolean,
+			"html": string,
+			"el": HTMLElement
+		}[];
 
 		// @ts-ignore
-		const newMarkdownEl = document.body.createDiv({ attr: { class: "obsidian-document " + (preview.renderer?.previewEl?.className ?? "") } });
-		const newSizerEl = newMarkdownEl.createDiv({ attr: { class: "markdown-preview-sizer" } });
+		const newMarkdownEl = document.body.createDiv({attr: {class: "obsidian-document " + (preview.renderer?.previewEl?.className ?? "")}});
+		const newSizerEl = newMarkdownEl.createDiv({attr: {class: "markdown-preview-sizer"}});
 
 		if (!newMarkdownEl || !newSizerEl) return failRender(preview.file, "Please specify a container element, or enable keepViewContainer!");
 
@@ -306,8 +338,7 @@ export namespace _MarkdownRendererInternal {
 			if (!success) return failRender(preview.file, "Failed to compute section!");
 
 			// compile dataview
-			if (DataviewRenderer.isDataviewEnabled())
-			{
+			if (DataviewRenderer.isDataviewEnabled()) {
 				const dataviewInfo = DataviewRenderer.getDataViewsFromHTML(section.el)[0];
 				if (dataviewInfo) {
 					const dataviewContainer = document.body.createDiv();
@@ -354,7 +385,8 @@ export namespace _MarkdownRendererInternal {
 				image.style.width = canvas.style.width || "100%";
 				image.style.maxWidth = "100%";
 				canvas.replaceWith(image);
-			};
+			}
+			;
 
 			//console.debug(section.el.outerHTML); // for some reason adding this line here fixes an issue where some plugins wouldn't render
 
@@ -376,7 +408,12 @@ export namespace _MarkdownRendererInternal {
 
 		// create the markdown-preview-pusher element
 		if (options.createPusherElement) {
-			newSizerEl.createDiv({ attr: { class: "markdown-pusher", style: "width: 1px; height: 0.1px; margin-bottom: 0px;" } });
+			newSizerEl.createDiv({
+				attr: {
+					class: "markdown-pusher",
+					style: "width: 1px; height: 0.1px; margin-bottom: 0px;"
+				}
+			});
 		}
 
 		// move all of them back in since rendering can cause some sections to move themselves out of their container
@@ -459,7 +496,7 @@ export namespace _MarkdownRendererInternal {
 			},
 		});
 		const newSizerEl = newMarkdownEl.createDiv({
-			attr: { class: "markdown-preview-sizer markdown-preview-section" },
+			attr: {class: "markdown-preview-sizer markdown-preview-section"},
 		});
 
 		if (!newMarkdownEl || !newSizerEl)
@@ -542,8 +579,8 @@ export namespace _MarkdownRendererInternal {
 			);
 			ExportLog.warning(
 				"Failed to render all sections in file " +
-					preview.file.name +
-					", using fallback!"
+				preview.file.name +
+				", using fallback!"
 			);
 			return renderMarkdownViewFallback(preview, options);
 		}
@@ -551,8 +588,7 @@ export namespace _MarkdownRendererInternal {
 		await Utils.delay(50);
 
 		// compile dataview
-		if (DataviewRenderer.isDataviewEnabled())
-		{
+		if (DataviewRenderer.isDataviewEnabled()) {
 			const dataviewInfos = DataviewRenderer.getDataViewsFromHTML(
 				preview.containerEl
 			);
@@ -588,8 +624,8 @@ export namespace _MarkdownRendererInternal {
 		) {
 			ExportLog.warning(
 				"Transclusions were not rendered correctly in file " +
-					preview.file.name +
-					"!"
+				preview.file.name +
+				"!"
 			);
 		}
 
@@ -786,7 +822,7 @@ export namespace _MarkdownRendererInternal {
 	}
 
 	export async function getIconForFile(file: TAbstractFile): Promise<{ icon: string; isDefault: boolean }> {
-		if (!file) return { icon: "", isDefault: true };
+		if (!file) return {icon: "", isDefault: true};
 
 		let iconOutput = "";
 		let iconProperty: string | undefined = "";
@@ -804,8 +840,7 @@ export namespace _MarkdownRendererInternal {
 			}
 		}
 
-		if (useFile instanceof TFile)
-		{
+		if (useFile instanceof TFile) {
 			const fileCache = app.metadataCache.getFileCache(useFile);
 			const frontmatter = fileCache?.frontmatter;
 			iconProperty = frontmatter?.icon ?? frontmatter?.sticker ?? frontmatter?.banner_icon; // banner plugin support
@@ -858,12 +893,12 @@ export namespace _MarkdownRendererInternal {
 
 		if (!parsedAsIconize && isUnchangedNotEmojiNotHTML) iconOutput = "";
 
-		return { icon: iconOutput, isDefault: useDefaultIcon };
+		return {icon: iconOutput, isDefault: useDefaultIcon};
 	}
 
 	export async function getTitleForFile(file: TAbstractFile): Promise<{ title: string; isDefault: boolean }> {
-		if (!file) return { title: "NULL ERROR", isDefault: true };
-		
+		if (!file) return {title: "NULL ERROR", isDefault: true};
+
 		let title = file.name;
 		let isDefaultTitle = true;
 		if (file instanceof TFile) {
@@ -886,7 +921,7 @@ export namespace _MarkdownRendererInternal {
 			isDefaultTitle = true;
 		}
 
-		return { title: title, isDefault: isDefaultTitle };
+		return {title: title, isDefault: isDefaultTitle};
 	}
 
 	export async function addTitle(documentRoot: HTMLElement, title: string, isDefaultTitle: boolean, icon: string, isDefaultIcon: boolean, source: TFile, exportOptions: MarkdownRendererOptions) {
@@ -904,10 +939,10 @@ export namespace _MarkdownRendererInternal {
 
 		// create header and footer
 		const sizerElement = documentRoot.querySelector(".markdown-preview-sizer");
-		const header = sizerElement?.createDiv({ cls: "header" });
-		header?.createDiv({ cls: "data-bar" });
-		const footer = sizerElement?.createDiv({ cls: "footer" });
-		footer?.createDiv({ cls: "data-bar" });
+		const header = sizerElement?.createDiv({cls: "header"});
+		header?.createDiv({cls: "data-bar"});
+		const footer = sizerElement?.createDiv({cls: "footer"});
+		footer?.createDiv({cls: "data-bar"});
 
 		if (header) sizerElement?.prepend(header);
 
@@ -972,14 +1007,13 @@ export namespace _MarkdownRendererInternal {
 		let contentEl = view.contentEl;
 		const canvasEl = contentEl.querySelector(".canvas");
 
-		if (!canvasEl)
-		{
+		if (!canvasEl) {
 			console.log(contentEl.innerHTML);
-			return failRender(view.file, "Failed to render canvas! Canvas element not found!");	
+			return failRender(view.file, "Failed to render canvas! Canvas element not found!");
 		}
 
-		const edgeContainer = canvasEl.createEl("svg", { cls: "canvas-edges" });
-		const edgeHeadContainer = canvasEl.createEl("svg", { cls: "canvas-edges" });
+		const edgeContainer = canvasEl.createEl("svg", {cls: "canvas-edges"});
+		const edgeHeadContainer = canvasEl.createEl("svg", {cls: "canvas-edges"});
 
 		for (const pair of nodes) {
 			const node = pair[1]; // value is the node
@@ -996,7 +1030,7 @@ export namespace _MarkdownRendererInternal {
 				embedEl.innerHTML = "";
 
 				if ((options.inlineHTML || !allExportedPaths.contains(nodeFile.path)) && childPreview) {
-					console.log("Inlining child preview", nodeFile.path);
+					ExportLog.warning("[fix-attachment] Inlining child preview", nodeFile.path);
 					if (childPreview.owner) {
 						childPreview.owner.file =
 							childPreview.file ??
@@ -1050,8 +1084,7 @@ export namespace _MarkdownRendererInternal {
 		let newContentEl: HTMLElement;
 		if (options.createDocumentContainer === false) {
 			newContentEl = canvasEl.cloneNode(true) as HTMLElement;
-		}
-		else {
+		} else {
 			newContentEl = contentEl.cloneNode(true) as HTMLElement;
 		}
 
@@ -1064,7 +1097,7 @@ export namespace _MarkdownRendererInternal {
 	}
 
 	export async function createMediaPage(file: TFile, options: MarkdownRendererOptions): Promise<HTMLElement> {
-		const contentEl = batchDocument.body.createDiv({ attr: { class: "obsidian-document" } });
+		const contentEl = batchDocument.body.createDiv({attr: {class: "obsidian-document"}});
 		const embedType = MarkdownRendererAPI.extentionToTag(file.extension);
 
 		let media = contentEl.createEl(embedType);
@@ -1168,6 +1201,31 @@ export namespace _MarkdownRendererInternal {
 			if (container) container.appendChild(embed);
 		});
 
+		// fix file embeds (internal-embed of non-media files).
+		/* Obsidian renders them as <span class="internal-embed file-embed"> containing a
+		 * <div class="file-embed-title"> (with a .file-embed-icon + the file name). A block
+		 * <div> inside an inline <span> is invalid HTML, so when the rendered output is
+		 * serialized and re-parsed the title div gets hoisted out of the span and ends up as a
+		 * separate sibling. Re-attach it so the embed and its title stay together, matching
+		 * Obsidian's structure. (The actual clickable download button is created later in
+		 * webpage.ts build(), after the src link has been remapped, so the download href stays
+		 * correct instead of being rewritten into an .html page link.)
+	     */
+		html.querySelectorAll("span.internal-embed.file-embed:empty").forEach((fileEmbed: HTMLElement) => {
+			// the title + icon were hoisted out of the span into the same container
+			// (the title div is a sibling of the <p> that contains the span)
+			const container = fileEmbed.parentElement?.parentElement ?? fileEmbed.parentElement;
+			const titleEl = container?.querySelector(".file-embed-title") as HTMLElement | null;
+			if (titleEl) {
+				fileEmbed.appendChild(titleEl);
+				fileEmbed.style.display = "block";
+			}
+
+			// drop the leftover empty <p> the parser creates next to the hoisted title
+			const emptyParagraph = fileEmbed.parentElement?.querySelector("p:empty");
+			emptyParagraph?.remove();
+		});
+
 		// remove all MAKE.md elements
 		html.querySelectorAll("div[class^='mk-']").forEach((element: HTMLElement) => {
 			element.remove();
@@ -1194,7 +1252,7 @@ export namespace _MarkdownRendererInternal {
 		for (const item of collapsableListItems) {
 			let collapseIcon = item.querySelector(".collapse-icon");
 			if (!collapseIcon) {
-				collapseIcon = item.createDiv({ cls: "list-collapse-indicator collapse-indicator collapse-icon" });
+				collapseIcon = item.createDiv({cls: "list-collapse-indicator collapse-indicator collapse-icon"});
 				collapseIcon.innerHTML = this.arrowHTML;
 				item.prepend(collapseIcon);
 			}
@@ -1233,8 +1291,7 @@ export namespace _MarkdownRendererInternal {
 		if (!parentFound) {
 			try {
 				renderLeaf.detach();
-			}
-			catch (e) {
+			} catch (e) {
 				ExportLog.error(e, "Failed to detach render leaf: ");
 			}
 
@@ -1274,8 +1331,7 @@ export namespace _MarkdownRendererInternal {
 			if (!errorInBatch) {
 				ExportLog.log("Closing render window");
 				renderLeaf.detach();
-			}
-			else {
+			} else {
 				ExportLog.warning("Error in batch, leaving render window open");
 				_reportProgress(1, "Completed with errors", "Please see the log for more details.", errorColor);
 
@@ -1350,6 +1406,7 @@ export namespace _MarkdownRendererInternal {
 	}
 
 	let logShowing = false;
+
 	function appendLogEl(logEl: HTMLElement) {
 		logContainer = loadingContainer?.querySelector(".html-progress-log") ?? undefined;
 
@@ -1366,7 +1423,7 @@ export namespace _MarkdownRendererInternal {
 
 		logContainer.appendChild(logEl);
 		// @ts-ignore
-		logEl.scrollIntoView({ behavior: "instant", block: "end", inline: "end" });
+		logEl.scrollIntoView({behavior: "instant", block: "end", inline: "end"});
 	}
 
 	export async function _reportProgress(fraction: number, message: string, subMessage: string, progressColor: string) {
@@ -1400,7 +1457,11 @@ export namespace _MarkdownRendererInternal {
 		electronWindow?.setProgressBar(fraction);
 	}
 
-	export async function _setFileList(items: string[], options: { icons?: string[] | string, renderAsMarkdown?: boolean, title?: string }) {
+	export async function _setFileList(items: string[], options: {
+		icons?: string[] | string,
+		renderAsMarkdown?: boolean,
+		title?: string
+	}) {
 		const contaienr = loadingContainer?.querySelector(".html-progress-content") as HTMLElement;
 		if (!contaienr) return;
 
@@ -1480,8 +1541,8 @@ export namespace ExportLog {
 		messageTitle = `[INFO] ${messageTitle}`
 		fullLog += logToString(message, messageTitle);
 
-		if (messageTitle != "") console.log(messageTitle + " ", message);
-		else console.log(message);
+		if (messageTitle != "") ExportLog.warning(messageTitle + " ", message);
+		else ExportLog.warning(message);
 
 		if (SettingsPage.loaded && !(Settings.logLevel == "all")) return;
 
@@ -1532,12 +1593,16 @@ export namespace ExportLog {
 	}
 
 	export function setProgress(fraction: number, message: string, subMessage: string, progressColor: string = "var(--interactive-accent)") {
-		fullLog += logToString({ fraction, message, subMessage }, "Progress");
+		fullLog += logToString({fraction, message, subMessage}, "Progress");
 		pullPathLogs();
 		_MarkdownRendererInternal._reportProgress(fraction, message, subMessage, progressColor);
 	}
 
-	export function setFileList(items: string[], options: { icons?: string[] | string, renderAsMarkdown?: boolean, title?: string }) {
+	export function setFileList(items: string[], options: {
+		icons?: string[] | string,
+		renderAsMarkdown?: boolean,
+		title?: string
+	}) {
 		_MarkdownRendererInternal._setFileList(items, options);
 	}
 
@@ -1566,7 +1631,7 @@ export namespace ExportLog {
 
 		debugInfo += `Log:\n${fullLog}\n\n`;
 
-		debugInfo += `Settings:\n${humanReadableJSON({ ...Settings })}\n\n`;
+		debugInfo += `Settings:\n${humanReadableJSON({...Settings})}\n\n`;
 
 		// @ts-ignore
 		const loadedPlugins = Object.values(app.plugins.plugins).filter((plugin) => plugin._loaded == true).map((plugin) => plugin.manifest.name).join("\n\t");
