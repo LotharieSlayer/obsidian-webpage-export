@@ -207,8 +207,12 @@ export namespace _MarkdownRendererInternal {
 	 */
 	function getUnrenderedExcalidrawEmbeds(roots: (HTMLElement | undefined)[], sourcePath: string): HTMLElement[] {
 		const excalidraw = getExcalidrawPlugin();
+		// Error handling
+		if (!excalidraw) {
+			ExportLog.error("Excalidraw plugin not found");
+			return [];
+		}
 		if (typeof excalidraw?.isExcalidrawFile != "function") return [];
-
 		const embeds = new Set<HTMLElement>();
 		for (const root of roots) {
 			if (!root) continue;
@@ -659,7 +663,7 @@ export namespace _MarkdownRendererInternal {
 		await Utils.delay(5);
 
 		// wait until the sizer contains all the sections
-		ExportLog.log("Waiting for all sections to be counted...");
+		// ExportLog.log("Waiting for all sections to be counted...");
 		var sectionsSuccess = await waitUntil(
 			() => {
 				console.log(sizerEl.children.length, sections.length);
@@ -706,7 +710,7 @@ export namespace _MarkdownRendererInternal {
 		}
 
 		// wait for transclusions
-		ExportLog.log("Waiting for transclusions to render...");
+		// ExportLog.log("Waiting for transclusions to render...");
 		await waitUntil(
 			() =>
 				!preview.containerEl.querySelector(
@@ -733,7 +737,7 @@ export namespace _MarkdownRendererInternal {
 		}
 
 		// wait for generic plugins
-		ExportLog.log("Waiting for generic plugins to render...");
+		// ExportLog.log("Waiting for generic plugins to render...");
 		await waitUntil(
 			() =>
 				!preview.containerEl.querySelector(
@@ -1409,6 +1413,14 @@ export namespace _MarkdownRendererInternal {
 			element.textContent = renderEl.textContent;
 			renderEl.remove();
 		}
+
+		// for all .excalidraw-svg (idk why it doesn't work during the render process)
+		html.querySelectorAll(".excalidraw-svg").forEach((element: HTMLElement) => {
+			element.style.width = "100%";
+			element.style.height = "auto";
+			element.style.backgroundColor = "white";
+			element.style.borderRadius = "5px";
+		});
 	}
 
 	export async function beginBatch(options: MarkdownRendererOptions) {
