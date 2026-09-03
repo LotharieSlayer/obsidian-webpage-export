@@ -186,6 +186,10 @@ export interface i18n
 			title: string;
 			description: string;
 		},
+		includeCssSnippets: {
+			title: string;
+			description: string;
+		},
 		includeStyleCssIds:{
 			title: string;
 			description: string;
