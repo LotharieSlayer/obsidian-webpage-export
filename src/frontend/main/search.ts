@@ -54,10 +54,20 @@ export class Search
 
 		console.log(type & SearchType.Title, type & SearchType.Aliases, type & SearchType.Headers, type & SearchType.Tags, type & SearchType.Path, type & SearchType.Content);
 	
+		// The `query` shown in the input keeps the search prefix (e.g. `tag:`),
+		// but MiniSearch indexes only the bare values. For a tag search, strip the
+		// `tag:` / `tags:` / `#` prefix before querying so it matches the indexed
+		// tag term (`type/dessert`), not `tag:type/dessert`.
+		const searchQuery = (type & SearchType.Tags)
+			? query.replace(/^(tag|tags):|^#/, "")
+			: query;
 		
-		const results: Array<SearchResult> = this.index.search(query, 
+		const results: Array<SearchResult> = this.index.search(searchQuery, 
 		{ 
-			prefix: true, 
+			// Tag searches must match the tag term exactly (e.g. `type/dessert`
+			// should NOT return `type/plat`). MiniSearch's `prefix` matches
+			// parent tags, so disable it for tag-only queries.
+			prefix: (type & SearchType.Tags) === 0, 
 			fuzzy: 0.2, 
 			boost: { title: 2, aliases: 1.8, headers: 1.5, tags: 1.3, path: 1.1 }, 
 			fields: searchFields 

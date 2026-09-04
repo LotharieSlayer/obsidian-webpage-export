@@ -88,7 +88,21 @@ export function initRecipeView() {
 			settings: settingsObj,
 		});
 
+		// Intercept tag-link clicks inside the card.  In Obsidian, clicking a
+		// tag opens a search for that tag.  In the browser export the `<a>` has
+		// `href="#tagname"` which just scrolls to a non-existent anchor.  Route
+		// it to the site's search instead.
+		function onTagClick(e: Event) {
+			const a = (e.target as HTMLElement)?.closest("a.tag") as HTMLAnchorElement | null;
+			if (!a) return;
+			e.preventDefault();
+			const tag = a.textContent?.replace(/^#/, "") ?? "";
+			if (tag) ObsidianSite.search?.searchParseFilters("tag:" + tag);
+		}
+		wrapper.addEventListener("click", onTagClick);
+
 		teardown = () => {
+			wrapper.removeEventListener("click", onTagClick);
 			if (cardTeardown) {
 				try {
 					cardTeardown();
