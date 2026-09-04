@@ -222,6 +222,7 @@ export class SettingsPage extends PluginSettingTab
 		createFeatureSetting(section, lang.aliases.title,			Settings.exportOptions.aliasOptions,			lang.aliases.description);
 		// createFeatureSetting(section, lang.properties.title,		Settings.exportOptions.propertiesOptions,		lang.properties.description);
 		createFeatureSetting(section, lang.rss.title,				Settings.exportOptions.rssOptions,				lang.rss.description);
+		createFeatureSetting(section, lang.recipeView.title,		Settings.exportOptions.recipeViewOptions,		lang.recipeView.description);
 
 		// #endregion
 

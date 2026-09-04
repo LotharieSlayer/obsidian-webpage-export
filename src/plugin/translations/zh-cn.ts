@@ -169,6 +169,10 @@ export const language: i18n =
 			info_siteUrlPlaceholder: "https://example.com/mysite",
 			info_authorName: "站点作者的名称"
 		},
+		recipeView: {
+			title: "Recipe View",
+			description: "Render matching notes as interactive recipe cards (from the obsidian-recipe-view-plugin)."
+		},
 		styleOptionsSection: {
 			title: "样式选项",
 			description: "配置导出中包含的样式"

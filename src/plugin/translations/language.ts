@@ -174,6 +174,10 @@ export interface i18n
 			info_siteUrlPlaceholder: string;
 			info_authorName: string;
 		},
+		recipeView: {
+			title: string;
+			description: string;
+		},
 		styleOptionsSection: {
 			title: string;
 			description: string;

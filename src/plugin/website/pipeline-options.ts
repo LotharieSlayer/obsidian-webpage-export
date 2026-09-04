@@ -14,6 +14,7 @@ import { CustomHeadOptions } from "src/shared/features/custom-head";
 import { MarkdownRendererOptions } from "src/plugin/render-api/api-options";
 import { RssOptions } from "src/shared/features/rss";
 import { LinkPreviewOptions } from "src/shared/features/link-preview";
+import { RecipeViewOptions } from "src/shared/features/recipe-view";
 
 export class ExportPipelineOptions extends MarkdownRendererOptions
 {
@@ -104,6 +105,11 @@ export class ExportPipelineOptions extends MarkdownRendererOptions
 	 * The options for the link preview feature.
 	 */
 	linkPreviewOptions: LinkPreviewOptions = new LinkPreviewOptions();
+
+	/**
+	 * The options for the recipe view feature.
+	 */
+	recipeViewOptions: RecipeViewOptions = new RecipeViewOptions();
 
 	/**
 	 * Make outline links relative instead of absolute.

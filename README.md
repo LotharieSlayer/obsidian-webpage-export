@@ -19,6 +19,10 @@ Demo / docs: [docs.obsidianweb.net](https://docs.obsidianweb.net/)
 - Optimized for web and mobile
 - Most plugins supported (dataview, tasks, etc...)
 - Option to export html and dependencies into one single file
+- [Folder notes](https://github.com/LostPaul/obsidian-folder-notes) support
+- [Excalidraw](https://github.com/zsviczian/obsidian-excalidraw-plugin) support
+- [Manual sorting](https://github.com/kh4f/manual-sorting) support
+- [Recipe view](https://github.com/LotharieSlayer/obsidian-recipe-view) support
 
 ## Using the Plugin
 Check out the new docs for details on using the plugin:
