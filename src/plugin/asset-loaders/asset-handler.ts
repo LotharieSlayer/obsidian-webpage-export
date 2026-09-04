@@ -21,6 +21,7 @@ import { GlobalVariableStyles } from "./global-variable-styles.js";
 import { Favicon } from "./favicon.js";
 import { FetchBuffer } from "./local-fetch-buffer.js";
 import { SupportedPluginStyles } from "./supported-plugin-styles.js";
+import { RecipeView } from "./recipe-view.js";
 import { ExportLog } from "src/plugin/render-api/render-api.js";
 import { fileTypeFromBuffer } from "file-type";
 import { ExportPipelineOptions } from "src/plugin/website/pipeline-options.js";
@@ -108,6 +109,7 @@ export class AssetHandler
 	// other
 	public static favicon: Favicon;
 	public static customHeadContent: CustomHeadContent;
+	public static recipeView: RecipeView;
 	public static mainJsModTime: number = 0;
 	public static mainJsPath: Path;
 
@@ -141,6 +143,7 @@ export class AssetHandler
 		this.themeLoadJS = new AssetLoader("theme-load.js", themeLoadJS, null, AssetType.Script, InlinePolicy.Inline, true, Mutability.Static, LoadMethod.Defer);
 		this.favicon = new Favicon();
 		this.customHeadContent = new CustomHeadContent();
+		this.recipeView = new RecipeView();
 
 
 		this.initPaths();

@@ -207,11 +207,6 @@ export namespace _MarkdownRendererInternal {
 	 */
 	function getUnrenderedExcalidrawEmbeds(roots: (HTMLElement | undefined)[], sourcePath: string): HTMLElement[] {
 		const excalidraw = getExcalidrawPlugin();
-		// Error handling
-		if (!excalidraw) {
-			ExportLog.error("Excalidraw plugin not found");
-			return [];
-		}
 		if (typeof excalidraw?.isExcalidrawFile != "function") return [];
 		const embeds = new Set<HTMLElement>();
 		for (const root of roots) {

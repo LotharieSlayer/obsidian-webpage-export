@@ -162,6 +162,10 @@ export const language: i18n =
 			info_siteUrlPlaceholder: "https://example.com/mysite",
 			info_authorName: "Il nome dell'autore del sito"
 		},
+		recipeView: {
+			title: "Recipe View",
+			description: "Render matching notes as interactive recipe cards (from the obsidian-recipe-view-plugin)."
+		},
 		styleOptionsSection: {
 			title: "Opzioni di Stile",
 			description: "Configura quali stili includere nell'esportazione"

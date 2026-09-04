@@ -7,6 +7,7 @@ import { GraphViewOptions } from "./features/graph-view";
 import { LinkPreviewOptions } from "./features/link-preview";
 import { OutlineOptions } from "./features/outline";
 import { PropertiesOptions } from "./features/properties";
+import { RecipeViewOptions } from "./features/recipe-view";
 import { RssOptions } from "./features/rss";
 import { SearchOptions } from "./features/search";
 import { SidebarOptions } from "./features/sidebar";
@@ -136,6 +137,11 @@ export class WebsiteOptions
 	 */
 	linkPreview: LinkPreviewOptions;
 
+	/**
+	 * The options for the recipe view feature (from the recipe-view plugin).
+	 */
+	recipeView: RecipeViewOptions;
+
 	public static fromJSON(json: string): WebsiteOptions
 	{
 		let data = Object.assign(new WebsiteOptions(), JSON.parse(json));
@@ -153,6 +159,7 @@ export class WebsiteOptions
 		data.document = Object.assign(new DocumentOptions(), data.document);
 		data.rss = Object.assign(new RssOptions(), data.rss);
 		data.linkPreview = Object.assign(new LinkPreviewOptions(), data.linkPreview);
+		data.recipeView = Object.assign(new RecipeViewOptions(), data.recipeView);
 
 		return data;
 	}
@@ -181,11 +188,29 @@ export class WebsiteData
 	hasFavicon: boolean = false;
 	featureOptions: WebsiteOptions = new WebsiteOptions();
 
+	/**
+	 * The recipe-view plugin settings, captured from its data.json at export time
+	 * and shipped so the browser can render recipes identically to Obsidian.
+	 */
+	recipeView: RecipeViewData = new RecipeViewData();
+
 
 	public static fromJSON(json: string): WebsiteData
 	{
 		let data = Object.assign(new WebsiteData(), JSON.parse(json));
 		data.featureOptions = WebsiteOptions.fromJSON(JSON.stringify(data.featureOptions));
+		data.recipeView = Object.assign(new RecipeViewData(), data.recipeView);
 		return data;
 	}
+}
+
+export class RecipeViewData
+{
+	enabled: boolean = false;
+	sideColumnRegex: string = "Ingredients|Nutrition";
+	treatH1AsFilename: boolean = false;
+	renderUnicodeFractions: boolean = true;
+	singleColumnMaxWidth: number = 600;
+	showBulletsTwoColumn: boolean = false;
+	tag: string = "";
 }

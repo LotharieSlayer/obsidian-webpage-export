@@ -9,6 +9,7 @@ import {ExportPipelineOptions} from "src/plugin/website/pipeline-options.js";
 import {DocumentType} from "src/shared/website-data";
 import {Settings} from "src/plugin/settings/settings";
 import {AssetHandler} from "src/plugin/asset-loaders/asset-handler";
+import {RecipeView} from "src/plugin/asset-loaders/recipe-view";
 import {Shared} from "src/shared/shared";
 import {moment} from "obsidian";
 
@@ -494,6 +495,10 @@ export class Webpage extends Attachment {
 			this.remapFileEmbeds();
 		}
 
+		// render recipe notes as the interactive recipe card instead of plain markdown
+		if (this.exportOptions.recipeViewOptions.enabled && this.type != DocumentType.Attachment)
+			this.injectRecipeView();
+
 		// add math styles to the document. They are here and not in <head> because they are unique to each document
 		if (this.exportOptions.addMathjaxStyles && this.type != DocumentType.Attachment) {
 			const mathStyleEl = document.createElement("style");
@@ -540,6 +545,48 @@ export class Webpage extends Attachment {
 		await this.generateOutput();
 
 		return this;
+	}
+
+	/**
+	 * Is this page a recipe note? A page is a recipe when the recipe view feature is
+	 * enabled and the note is tagged with the `recipe-view` plugin's configured tag.
+	 * If the plugin's tag is empty, every markdown page is treated as a recipe.
+	 */
+	private isRecipe(): boolean {
+		const tag = RecipeView.settings.tag?.trim();
+		if (!tag) return true;
+
+		const normalizedTag = tag.startsWith("#") ? tag : "#" + tag;
+		return this.frontmatterTags.includes(normalizedTag);
+	}
+
+	/**
+	 * Mark this page as a recipe and embed the pre-rendered markdown (already
+	 * link-remapped above) in a JSON payload. The frontend reads this to mount the
+	 * `RecipeCard` instead of the plain document.
+	 */
+	private injectRecipeView() {
+		if (!this.isRecipe()) return;
+
+		const contentEl = this.sizerElement ?? this.viewElement;
+		if (!contentEl) return;
+
+		this.viewElement?.setAttribute("data-recipe", "true");
+
+		const payload = {
+			html: contentEl.innerHTML,
+			frontmatter: this.frontmatter,
+			fileName: this.source.basename,
+		};
+
+		// escape "<" so the JSON can never terminate the enclosing <script> tag
+		const json = JSON.stringify(payload).replace(/</g, "\\u003c");
+
+		const payloadEl = this.pageDocument.createElement("script");
+		payloadEl.setAttribute("type", "application/json");
+		payloadEl.setAttribute("id", "recipe-payload");
+		payloadEl.textContent = json;
+		if (this.viewElement) this.viewElement.appendChild(payloadEl);
 	}
 
 	public async renderDocument(): Promise<Webpage | undefined> {

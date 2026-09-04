@@ -9,9 +9,10 @@ import Minisearch from 'minisearch';
 import { Path } from "src/plugin/utils/path";
 import HTMLExportPlugin from "src/plugin/main";
 import { AssetType } from "src/plugin/asset-loaders/asset-types";
+import { RecipeView } from "src/plugin/asset-loaders/recipe-view";
 import RSS from 'rss';
 import { AssetLoader } from "src/plugin/asset-loaders/base-asset";
-import { FileData, WebpageData, WebsiteData } from "src/shared/website-data";
+import { FileData, RecipeViewData, WebpageData, WebsiteData } from "src/shared/website-data";
 import { Utils } from "src/plugin/utils/utils";
 import { Shared } from "src/shared/shared";
 import { WebpageTemplate } from "./webpage-template";
@@ -98,7 +99,20 @@ export class Index
 				document: options.documentOptions,
 				rss: options.rssOptions,
 				linkPreview: options.linkPreviewOptions,
+				recipeView: options.recipeViewOptions,
 			};
+
+			// copy the recipe-view plugin's settings (from its data.json) so the
+			// browser can render recipe cards identically to how they appear in Obsidian
+			this.websiteData.recipeView = Object.assign(new RecipeViewData(), {
+				enabled: RecipeView.settings.enabled,
+				sideColumnRegex: RecipeView.settings.sideColumnRegex,
+				treatH1AsFilename: RecipeView.settings.treatH1AsFilename,
+				renderUnicodeFractions: RecipeView.settings.renderUnicodeFractions,
+				singleColumnMaxWidth: RecipeView.settings.singleColumnMaxWidth,
+				showBulletsTwoColumn: RecipeView.settings.showBulletsTwoColumn,
+				tag: RecipeView.settings.tag,
+			});
 			
 			// set global values
 			this.websiteData.modifiedTime = Date.now();
