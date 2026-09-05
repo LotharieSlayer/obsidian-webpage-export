@@ -111,7 +111,7 @@ export class ExportModal extends Modal
 
 		this.titleEl.setText(ExportModal.title);
 
-		if (HTMLExportPlugin.updateInfo.updateAvailable) 
+		if (HTMLExportPlugin.updateInfo.updateAvailable)
 		{
 			// create red notice showing the update is available
 			const updateNotice = contentEl.createEl('strong', { text: `${i18n.updateAvailable}: ${HTMLExportPlugin.updateInfo.currentVersion} ⟶ ${HTMLExportPlugin.updateInfo.latestVersion}` });

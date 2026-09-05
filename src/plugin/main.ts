@@ -146,12 +146,12 @@ export default class HTMLExportPlugin extends Plugin {
 
 		try {
 			let url =
-				"https://raw.githubusercontent.com/KosmosisDire/obsidian-webpage-export/master/manifest.json?cache=" +
+				"https://raw.githubusercontent.com/LotharieSlayer/obsidian-webpage-export/master/manifest.json?cache=" +
 				Date.now() +
 				"";
 			if (this.manifest.version.endsWith("b"))
 				url =
-					"https://raw.githubusercontent.com/KosmosisDire/obsidian-webpage-export/master/manifest-beta.json?cache=" +
+					"https://raw.githubusercontent.com/LotharieSlayer/obsidian-webpage-export/master/manifest-beta.json?cache=" +
 					Date.now() +
 					"";
 			const manifestResp = await requestUrl(url);

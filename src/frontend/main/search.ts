@@ -68,7 +68,9 @@ export class Search
 			// should NOT return `type/plat`). MiniSearch's `prefix` matches
 			// parent tags, so disable it for tag-only queries.
 			prefix: (type & SearchType.Tags) === 0, 
-			fuzzy: 0.2, 
+			// Tag searches must match the tag term exactly: `frères-cook` must NOT
+			// return `frères-cuck`. Disable fuzzy for tag-only queries.
+			fuzzy: (type & SearchType.Tags) === 0 ? 0.2 : false, 
 			boost: { title: 2, aliases: 1.8, headers: 1.5, tags: 1.3, path: 1.1 }, 
 			fields: searchFields 
 		});
